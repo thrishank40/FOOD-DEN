@@ -1,0 +1,41 @@
+﻿# Environment variables and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.sample
+
+# Dependencies and generated files
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+coverage/
+.venv/
+venv/
+__pycache__/
+
+# Local backups and temporary files
+_backups_phase2/
+*.bak
+*.log
+*.tmp
+
+# Private keys
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Editor and operating system files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Sensitive screenshot
+Output Screenshots/ss11-mongodb-atlas.png
