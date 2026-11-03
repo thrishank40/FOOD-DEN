@@ -31,50 +31,40 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  "http://127.0.0.1:5175",
+  "http://127.0.0.1:3000",
 
-  // Vercel ENV
+  // Vercel / Custom ENV
   process.env.CLIENT_URL,
-
 ].filter(Boolean);
 
+const isOriginAllowed = (origin) => {
+  // Allow requests with no origin (mobile apps, curl, Postman, server-to-server)
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  // Allow any localhost / 127.0.0.1 port during local development
+  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return true;
+  return false;
+};
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (isOriginAllowed(origin)) {
+      return callback(null, true);
+    }
+    console.warn("Blocked by CORS policy:", origin);
+    return callback(null, false);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  exposedHeaders: ["Authorization"],
+};
 
-      // allow postman/mobile apps
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      console.log("Blocked by CORS:", origin);
-
-      return callback(
-        new Error("CORS policy: Origin not allowed")
-      );
-    },
-
-    credentials: true,
-
-    methods: [
-      "GET",
-      "POST",
-      "PUT",
-      "DELETE",
-      "PATCH",
-      "OPTIONS",
-    ],
-
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-    ],
-  })
-);
+app.use(cors(corsOptions));
 
 
 // ===============================
@@ -97,42 +87,34 @@ app.use(
 
 
 // ===============================
-// RATE LIMIT
-// ===============================
-
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-
-  max: 200,
-
-  standardHeaders: true,
-
-  legacyHeaders: false,
-
-  message: {
-    success: false,
-    message:
-      "Too many requests from this IP, please try again later.",
-  },
-});
-
-
-app.use("/api", apiLimiter);
-
-
-// ===============================
-// HEALTH CHECK
+// HEALTH CHECK (exempt from rate limit)
 // ===============================
 
 app.get("/api/health", (req, res) => {
-
   res.status(200).json({
     success: true,
-    message:
-      "FoodDen API is running 🚀",
+    message: "FoodDen API is running 🚀",
   });
-
 });
+
+// ===============================
+// RATE LIMIT
+// ===============================
+
+const isDev = process.env.NODE_ENV !== "production";
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isDev ? 1000 : 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many requests from this IP, please try again later.",
+  },
+});
+
+app.use("/api", apiLimiter);
 
 
 // ===============================

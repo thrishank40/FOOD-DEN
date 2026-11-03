@@ -41,6 +41,23 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (!error.response) {
+      error.isNetworkError = true;
+      error.userFriendlyMessage =
+        "Unable to connect to FoodDen backend server. Please verify the backend is running on port 5000.";
+    } else {
+      error.userFriendlyMessage =
+        error.response.data?.message ||
+        error.response.data?.error ||
+        "An error occurred. Please try again.";
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const getFoods    = ()       => api.get("/foods");
 export const getFoodById = (id)     => api.get(`/foods/${id}`);
 export const login       = (data)   => api.post("/auth/login", data);

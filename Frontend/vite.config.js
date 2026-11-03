@@ -14,4 +14,14 @@ export default defineConfig({
       'react-dom': resolve(__dirname, 'node_modules/react-dom'),
     },
   },
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })

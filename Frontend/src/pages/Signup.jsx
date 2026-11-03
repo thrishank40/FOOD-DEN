@@ -110,26 +110,49 @@ const Signup = () => {
 
     try {
       setLoading(true);
+      setApiErr("");
+      setSuccess("");
+
       const { data } = await register({
-        name:     form.name,
-        email:    form.email,
-        phone:    form.phone,
-        address:  form.address,
+        name:     form.name.trim(),
+        email:    form.email.trim().toLowerCase(),
+        phone:    form.phone.trim(),
+        address:  form.address.trim(),
         password: form.password,
-        // role is intentionally NOT sent
       });
 
-      const userData = data?.data?.user;
-      const token    = data?.data?.token;
+      const userData = data?.data?.user || data?.user;
+      const token    = data?.data?.token || data?.token;
+
+      if (!userData || !token) {
+        throw new Error("Invalid server response. Please try again.");
+      }
 
       loginUser(userData, token);
       setSuccess("Account created! Redirecting…");
       setTimeout(() => navigate("/dashboard"), 800);
 
     } catch (error) {
-      setApiErr(
-        error.response?.data?.message || "Registration failed. Please try again."
-      );
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        const fieldErrors = {};
+        error.response.data.errors.forEach((err) => {
+          if (err.path && !fieldErrors[err.path]) {
+            fieldErrors[err.path] = err.msg;
+          }
+        });
+        if (Object.keys(fieldErrors).length > 0) {
+          setErrors((prev) => ({ ...prev, ...fieldErrors }));
+        }
+      }
+
+      const message =
+        error.userFriendlyMessage ||
+        error.response?.data?.message ||
+        (error.message === "Network Error"
+          ? "Unable to connect to FoodDen server. Please ensure the backend server is running on port 5000."
+          : error.message) ||
+        "Registration failed. Please try again.";
+      setApiErr(message);
     } finally {
       setLoading(false);
     }

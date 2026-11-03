@@ -192,8 +192,28 @@ FoodDen/
 
 ## 🧪 Automated Testing
 
-The project includes an end-to-end integration test suite verifying all core user and admin flows:
+The project includes automated test suites verifying authentication, security, and full end-to-end user and admin workflows:
 
+### 1. Authentication & API Suite
+Run from the `backend` directory:
+```bash
+node test_auth_suite.js
+```
+**Tested Workflows:**
+- ✅ Health endpoint verification
+- ✅ CORS preflight verification (`http://localhost:5173`, `http://localhost:5174`, `http://127.0.0.1:5173`)
+- ✅ Customer registration with password hashing
+- ✅ Duplicate email rejection (`400 Bad Request`)
+- ✅ Password length validation (< 6 characters)
+- ✅ Customer login with JWT token generation
+- ✅ Case-insensitive email login
+- ✅ Invalid password rejection (`401 Unauthorized`)
+- ✅ Unregistered email rejection (`401 Unauthorized`)
+- ✅ Protected `/api/auth/me` JWT authentication
+- ✅ Admin login and role-based security guard
+- ✅ Frontend-to-backend communication via Vite proxy (`/api/health`)
+
+### 2. End-to-End Integration Suite
 Run from the `backend` directory:
 ```bash
 node test_e2e.js

@@ -1,7 +1,7 @@
-﻿# DelishDrop MERN Stack Upgrade - Setup Guide
+# FoodDen MERN Stack - Setup & Deployment Guide
 
 ## Overview
-DelishDrop has been upgraded to a full-featured food delivery platform with role-based access, real-time Socket.IO updates, security hardening, and a multi-role system supporting customers, restaurant owners, delivery riders, and admins.
+FoodDen is a comprehensive food delivery and restaurant management platform with role-based access, real-time Socket.IO updates, security hardening, and a multi-role system supporting customers, restaurant owners, delivery riders, and admins.
 
 ## Backend Setup
 
@@ -15,9 +15,9 @@ PORT=5000
 NODE_ENV=development
 
 # MongoDB
-MONGODB_URI=mongodb://localhost:27017/delishdrop
+MONGODB_URI=mongodb://localhost:27017/foodden
 # OR for MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-host>/delishdrop
+# MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-host>/foodden
 
 # JWT Authentication
 JWT_SECRET=your_super_secret_jwt_key_change_this_in_production

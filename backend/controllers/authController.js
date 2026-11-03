@@ -18,13 +18,14 @@ const register = async (req, res, next) => {
     }
 
     const { name, email, password, phone, address } = req.body;
+    const normalizedEmail = email ? email.trim().toLowerCase() : "";
 
     // ✅ SECURITY: role is NEVER taken from request body.
     // Public registration always creates a "user".
     // Admin is created ONLY via seedAdmin.js script.
     const FORCED_ROLE = "user";
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) {
       return res.status(400).json({
         success: false,
@@ -33,28 +34,32 @@ const register = async (req, res, next) => {
     }
 
     const user = await User.create({
-      name,
-      email,
+      name: name ? name.trim() : "",
+      email: normalizedEmail,
       password,
-      phone: phone || "",
-      address: address || "",
+      phone: phone ? phone.trim() : "",
+      address: address ? address.trim() : "",
       role: FORCED_ROLE,   // ← hardcoded, ignores anything from body
     });
 
     const token = generateToken(user._id, user.role);
 
+    const safeUser = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,   // will always be "user"
+      phone: user.phone,
+      address: user.address,
+    };
+
     res.status(201).json({
       success: true,
       message: "Account created successfully.",
+      token,
+      user: safeUser,
       data: {
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,   // will always be "user"
-          phone: user.phone,
-          address: user.address,
-        },
+        user: safeUser,
         token,
       },
     });
@@ -79,8 +84,9 @@ const login = async (req, res, next) => {
     }
 
     const { email, password } = req.body;
+    const normalizedEmail = email ? email.trim().toLowerCase() : "";
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email: normalizedEmail }).select("+password");
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -98,18 +104,22 @@ const login = async (req, res, next) => {
 
     const token = generateToken(user._id, user.role);
 
+    const safeUser = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      phone: user.phone,
+      address: user.address,
+    };
+
     res.status(200).json({
       success: true,
       message: "Logged in successfully.",
+      token,
+      user: safeUser,
       data: {
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          phone: user.phone,
-          address: user.address,
-        },
+        user: safeUser,
         token,
       },
     });

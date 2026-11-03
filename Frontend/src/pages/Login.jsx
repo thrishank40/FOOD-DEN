@@ -69,16 +69,24 @@ const Login = () => {
     setSuccess("");
 
     try {
-      const { data } = await login({ email: form.email.trim(), password: form.password });
-      const userData = data?.data?.user;
-      const token = data?.data?.token;
-      if (!userData || !token) throw new Error("Invalid server response.");
+      const email = form.email.trim().toLowerCase();
+      const { data } = await login({ email, password: form.password });
+      const userData = data?.data?.user || data?.user;
+      const token = data?.data?.token || data?.token;
+      if (!userData || !token) throw new Error("Invalid server response. Please try again.");
 
       loginUser(userData, token);
       setSuccess("Login successful! Redirecting...");
       setTimeout(() => redirectByRole(userData.role), 800);
     } catch (err) {
-      setApiErr(err.response?.data?.message || err.message || "Login failed. Please try again.");
+      const message =
+        err.userFriendlyMessage ||
+        err.response?.data?.message ||
+        (err.message === "Network Error"
+          ? "Unable to connect to FoodDen server. Please ensure the backend server is running on port 5000."
+          : err.message) ||
+        "Login failed. Please try again.";
+      setApiErr(message);
     } finally {
       setLoading(false);
     }

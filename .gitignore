@@ -1,41 +1,72 @@
-﻿# Environment variables and secrets
-.env
+﻿.env
 .env.*
 !.env.example
-!.env.sample
 **/.env
 **/.env.*
 !**/.env.example
-!**/.env.sample
 
-# Dependencies and generated files
 node_modules/
 **/node_modules/
-dist/
-**/dist/
-build/
-**/build/
-coverage/
+
 .venv/
 venv/
+env/
 __pycache__/
+*.pyc
 
-# Local backups and temporary files
-_backups_phase2/
-*.bak
+dist/
+build/
+coverage/
+.vite/
+.cache/
+.next/
+
 *.log
-*.tmp
+logs/
+temp/
+tmp/
 
-# Private keys
+uploads/
+**/uploads/
+backend/storage/
+
+*.sqlite
+*.sqlite3
+*.db
+*.bak
+*.backup
+
+*.zip
+*.rar
+*.7z
+
 *.pem
 *.key
-*.p12
-*.pfx
+credentials.json
+serviceAccount*.json
 
-# Editor and operating system files
 .vscode/
+.idea/
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Sensitive screenshot
+playwright-report/
+test-results/
+# Environment variables and secrets
+!.env.sample
+!**/.env.sample
+# Dependencies
+# Build output
+**/dist/
+**/build/
+# Local backups
+_backups_phase2/
+# Logs and temporary files
+*.tmp
+# Operating system and editor files
+# Private keys
+*.p12
+*.pfx
+# Atlas screenshot - review before publishing
 Output Screenshots/ss11-mongodb-atlas.png
